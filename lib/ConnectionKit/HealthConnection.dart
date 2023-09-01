@@ -2,6 +2,7 @@
 // Para conectar dar permisos de health en Xcode de HealthKit
 // ver en https://pub.dev/packages/health
 // Ing. Johan Guillen
+//Contacto +584247510916
 
 /*
 
@@ -16,6 +17,8 @@ Step 1: Append the Info.plist with the following 2 entries
 Step 2: Open your Flutter project in Xcode by right clicking on the "ios" folder
  and selecting "Open in Xcode". Next, enable "HealthKit" by adding a capability inside the "Signing & Capabilities" tab of the Runner target's settings.
 
+
+IMPORTANTE El valor de target Minimun Deployments : 13 en Xcode
  */
 
 import 'package:health/health.dart';
@@ -28,8 +31,8 @@ var types = [
 ];
 
 var perm = [
-  HealthDataAccess.READ_WRITE,
-  HealthDataAccess.READ_WRITE,
+  HealthDataAccess.READ,
+  HealthDataAccess.READ,
 ];
 
 
