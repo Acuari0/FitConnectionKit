@@ -29,6 +29,8 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   health: ^6.0.0
+  permission_handler: ^10.4.3
+  watch_connectivity: ^0.1.6
   flutter:
     sdk: flutter
 
