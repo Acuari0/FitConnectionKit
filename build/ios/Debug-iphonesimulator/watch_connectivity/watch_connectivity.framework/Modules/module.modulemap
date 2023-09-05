@@ -1,0 +1,11 @@
+framework module watch_connectivity {
+  umbrella header "watch_connectivity-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module watch_connectivity.Swift {
+  header "watch_connectivity-Swift.h"
+  requires objc
+}

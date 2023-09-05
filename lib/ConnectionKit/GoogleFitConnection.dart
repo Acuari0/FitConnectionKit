@@ -15,6 +15,8 @@ keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias androi
 * Despues debemos configurar el proyecto en Google cloud dandole permisos a Google Fit
 * Hacer lo que indican estas instrucciones
 *
+* Ojo vincular el proyecto con Firebase
+*
 * https://developers.google.com/fit/android/get-api-key?hl=es-419
 *
 *

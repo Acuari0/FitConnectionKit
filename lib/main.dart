@@ -1,12 +1,65 @@
 import 'package:fitconnectionkit/ConnectionKit/HealthConnection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+import 'package:provider/provider.dart';
+
+import 'ConnectionKit/Watch/ConnectionByBluetooth/constants/shared_prefs_strings.dart';
+import 'ConnectionKit/Watch/ConnectionByBluetooth/models/bluetooth_model.dart';
+import 'ConnectionKit/Watch/ConnectionByBluetooth/models/home.dart';
+import 'ConnectionKit/Watch/ConnectionByBluetooth/pages/device_list.dart';
+import 'ConnectionKit/Watch/ConnectionByBluetooth/pages/home.dart';
+import 'ConnectionKit/Watch/ConnectionByBluetooth/utils/shared_prefs_utils.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<BluetoothModel>(create: (_) => BluetoothModel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
+  Widget _showPage(BuildContext context) {
+
+    return FutureBuilder(
+      future:
+      SharedPrefsUtils.getString(SharedPrefsStrings.DEVICE_ID_KEY),
+      builder: (context, futureSnapshot) {
+        String? deviceId = futureSnapshot.data;
+        if (deviceId == null) {
+          return const DeviceListPage();
+        } else {
+          var bluetoothModel = context.read<BluetoothModel>();
+          return StreamBuilder(
+            stream: bluetoothModel.connect(deviceId),
+            builder: (__, streamSnapshot) {
+              if (streamSnapshot.hasData) {
+                ConnectionStateUpdate? connectionStateUpdate =
+                    streamSnapshot.data;
+                DeviceConnectionState state =
+                    connectionStateUpdate?.connectionState ??
+                        DeviceConnectionState.disconnected;
+                if (state == DeviceConnectionState.connected) {
+                  return ChangeNotifierProvider<HomeModel>(
+                    create: (_) => HomeModel(),
+                    child: const HomePage(),
+                  );
+                } else {
+                  return const DeviceListPage();
+                }
+              }
+              return const DeviceListPage();
+            },
+          );
+        }
+      },
+    );
+  }
 
   // This widget is the root of your application.
   @override
@@ -14,25 +67,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: _showPage(context)/*const MyHomePage(title: 'Flutter Demo Home Page')*/,
     );
   }
 }
@@ -65,9 +103,11 @@ class _MyHomePageState extends State<MyHomePage> {
     RequestPermissionHealth();
   }
 
+  
+
+
   void _incrementCounter() {
     setState(() {
-
       Write_Health().then((value) {
         Steps_Health_Day().then((value) {
           print("steps day = $value");
